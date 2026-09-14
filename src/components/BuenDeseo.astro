@@ -1,13 +1,26 @@
 ---
 // src/components/BuenDeseo.astro
+// Usa Netlify Forms: no necesita ninguna key ni servicio externo.
+// Los mensajes quedan guardados en tu panel de Netlify > Site > Forms.
+// IMPORTANTE: esto solo funciona en el sitio ya publicado en Netlify,
+// NO funciona corriendo "npm run dev" en tu computadora.
 ---
 
 <section class="buen-deseo">
   <p class="titulo">Dejale un buen deseo a Suyi</p>
 
-  <form id="form-deseo" class="form-deseo">
+  <form
+    name="buen-deseo"
+    method="POST"
+    data-netlify="true"
+    id="form-deseo"
+    class="form-deseo"
+  >
+    <input type="hidden" name="form-name" value="buen-deseo" />
+
     <input
       type="text"
+      name="nombre"
       id="nombre-deseo"
       class="input-texto"
       placeholder="Tu nombre"
@@ -15,6 +28,7 @@
       required
     />
     <textarea
+      name="mensaje"
       id="mensaje-deseo"
       class="textarea-deseo"
       placeholder="Escribí tu buen deseo..."
@@ -28,50 +42,23 @@
 </section>
 
 <script>
-  // Pegá acá el Bin ID y la Access Key que te da JSONBin.io (ver instrucciones)
-  const BIN_ID = "PEGÁ_ACÁ_TU_BIN_ID";
-  const ACCESS_KEY = "PEGÁ_ACÁ_TU_ACCESS_KEY";
-
   function inicializarDeseo(seccion: HTMLElement) {
     const form = seccion.querySelector<HTMLFormElement>("#form-deseo")!;
-    const inputNombre = seccion.querySelector<HTMLInputElement>("#nombre-deseo")!;
-    const inputMensaje = seccion.querySelector<HTMLTextAreaElement>("#mensaje-deseo")!;
     const boton = seccion.querySelector<HTMLButtonElement>("#boton-enviar")!;
     const feedback = seccion.querySelector<HTMLElement>("#feedback-deseo")!;
 
     form.addEventListener("submit", async (evento) => {
       evento.preventDefault();
 
-      const nombre = inputNombre.value.trim();
-      const mensaje = inputMensaje.value.trim();
-      if (!nombre || !mensaje) return;
-
       boton.disabled = true;
       boton.textContent = "Enviando...";
 
       try {
-        // 1. Traer los deseos que ya hay guardados
-        const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-          headers: { "X-Access-Key": ACCESS_KEY },
-        });
-        const datosActuales = await resGet.json();
-        const deseos = Array.isArray(datosActuales.record?.deseos) ? datosActuales.record.deseos : [];
-
-        // 2. Sumar el nuevo deseo
-        deseos.push({
-          nombre,
-          mensaje,
-          fecha: new Date().toISOString(),
-        });
-
-        // 3. Guardar la lista completa de vuelta
-        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Access-Key": ACCESS_KEY,
-          },
-          body: JSON.stringify({ deseos }),
+        const datos = new FormData(form);
+        await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(datos as unknown as Record<string, string>).toString(),
         });
 
         form.hidden = true;
