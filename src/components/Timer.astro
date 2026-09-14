@@ -1,0 +1,205 @@
+---
+// src/components/Timer.astro
+interface Props {
+  // Fecha en que arranca el evento (inicio del día). Se usa para el primer conteo, en días.
+  fechaEvento?: string;
+  // Momento exacto en que entra la quinceañera. Se usa para el segundo conteo, el día del evento.
+  horaEntrada?: string;
+}
+
+const {
+  fechaEvento = "2026-10-31T00:00:00",
+  horaEntrada = "2026-10-31T20:00:00",
+} = Astro.props;
+---
+
+<section class="timer" data-fecha-evento={fechaEvento} data-hora-entrada={horaEntrada}>
+  <p class="etiqueta" id="timer-etiqueta">Faltan</p>
+
+  <div class="cuenta" id="timer-cuenta">
+    <div class="unidad" data-unidad="dias">
+      <span class="numero" id="timer-dias">00</span>
+      <span class="texto">Días</span>
+    </div>
+    <span class="separador">:</span>
+    <div class="unidad" data-unidad="horas">
+      <span class="numero" id="timer-horas">00</span>
+      <span class="texto">Horas</span>
+    </div>
+    <span class="separador">:</span>
+    <div class="unidad" data-unidad="minutos">
+      <span class="numero" id="timer-minutos">00</span>
+      <span class="texto">Min</span>
+    </div>
+    <span class="separador">:</span>
+    <div class="unidad" data-unidad="segundos">
+      <span class="numero" id="timer-segundos">00</span>
+      <span class="texto">Seg</span>
+    </div>
+  </div>
+
+  <div class="divisor-orn" aria-hidden="true">
+    <span class="linea"></span>
+    <span class="rombo"></span>
+    <span class="linea"></span>
+  </div>
+
+  <p class="mensaje-final" id="timer-final" hidden>Hoy es el gran día 🦋</p>
+</section>
+
+<script>
+  function inicializarTimer(seccion: HTMLElement) {
+    const fechaEvento = new Date(seccion.dataset.fechaEvento!).getTime();
+    const horaEntrada = new Date(seccion.dataset.horaEntrada!).getTime();
+
+    const etiqueta = seccion.querySelector<HTMLElement>("#timer-etiqueta")!;
+    const cuenta = seccion.querySelector<HTMLElement>("#timer-cuenta")!;
+    const mensajeFinal = seccion.querySelector<HTMLElement>("#timer-final")!;
+    const unidadDias = seccion.querySelector<HTMLElement>('[data-unidad="dias"]')!;
+    const separadores = seccion.querySelectorAll<HTMLElement>(".separador");
+
+    const elDias = seccion.querySelector<HTMLElement>("#timer-dias")!;
+    const elHoras = seccion.querySelector<HTMLElement>("#timer-horas")!;
+    const elMinutos = seccion.querySelector<HTMLElement>("#timer-minutos")!;
+    const elSegundos = seccion.querySelector<HTMLElement>("#timer-segundos")!;
+
+    function dosDigitos(n: number) {
+      return String(Math.max(n, 0)).padStart(2, "0");
+    }
+
+    function tick() {
+      const ahora = Date.now();
+      let objetivo: number;
+
+      if (ahora < fechaEvento) {
+        // Fase 1: contando los días hasta el evento
+        objetivo = fechaEvento;
+        etiqueta.textContent = "Faltan";
+        unidadDias.hidden = false;
+        separadores[0].hidden = false;
+      } else if (ahora < horaEntrada) {
+        // Fase 2: es el día del evento, contando hasta que entre la quinceañera
+        objetivo = horaEntrada;
+        etiqueta.textContent = "Faltan para que entre la quinceañera";
+        unidadDias.hidden = true;
+        separadores[0].hidden = true;
+      } else {
+        // Fase 3: ya entró
+        cuenta.hidden = true;
+        etiqueta.hidden = true;
+        mensajeFinal.hidden = false;
+        clearInterval(intervalo);
+        return;
+      }
+
+      const diff = objetivo - ahora;
+      const dias = Math.floor(diff / 86_400_000);
+      const horas = Math.floor((diff % 86_400_000) / 3_600_000);
+      const minutos = Math.floor((diff % 3_600_000) / 60_000);
+      const segundos = Math.floor((diff % 60_000) / 1_000);
+
+      elDias.textContent = dosDigitos(dias);
+      elHoras.textContent = dosDigitos(horas);
+      elMinutos.textContent = dosDigitos(minutos);
+      elSegundos.textContent = dosDigitos(segundos);
+    }
+
+    tick();
+    const intervalo = setInterval(tick, 1000);
+  }
+
+  document.querySelectorAll<HTMLElement>(".timer").forEach(inicializarTimer);
+</script>
+
+<style>
+  .timer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+    background: #fffdfb;
+    color: #231f20;
+    text-align: center;
+  }
+
+  .etiqueta {
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(1rem, 4.5vw, 1.3rem);
+    color: #6b6870;
+    margin: 0 0 1.6rem;
+    max-width: 320px;
+  }
+
+  .cuenta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(0.4rem, 2vw, 0.9rem);
+  }
+
+  .unidad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 3.2rem;
+  }
+
+  .numero {
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: clamp(2.2rem, 10vw, 3.2rem);
+    line-height: 1;
+    color: #d9584a;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .texto {
+    margin-top: 0.4rem;
+    font-family: "Cormorant", serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8a8681;
+  }
+
+  .separador {
+    font-family: "Cormorant", serif;
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    color: #d9c9c4;
+    line-height: 1;
+    align-self: flex-start;
+    padding-top: 0.05em;
+  }
+
+  .divisor-orn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 2rem;
+  }
+
+  .divisor-orn .linea {
+    width: 42px;
+    height: 1px;
+    background: #c9c4be;
+  }
+
+  .divisor-orn .rombo {
+    width: 6px;
+    height: 6px;
+    background: #d9584a;
+    transform: rotate(45deg);
+  }
+
+  .mensaje-final {
+    font-family: "Cormorant", serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    color: #d9584a;
+    margin: 0;
+  }
+</style>

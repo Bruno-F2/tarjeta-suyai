@@ -1,0 +1,65 @@
+---
+// src/components/Frase.astro
+interface Props {
+  texto?: string;
+}
+
+const {
+  texto = "Quiero que seas parte de este momento especial para mí, para que sea inolvidable",
+} = Astro.props;
+---
+
+<section class="frase-invitados">
+  <p class="texto">{texto}</p>
+
+  <div class="divisor-orn" aria-hidden="true">
+    <span class="linea"></span>
+    <span class="rombo"></span>
+    <span class="linea"></span>
+  </div>
+</section>
+
+<style>
+  .frase-invitados {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+    padding: 3.5rem 1.75rem;
+    background: #fffdfb;
+    text-align: center;
+  }
+
+  .texto {
+    max-width: 32ch;
+    margin: 0;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: #231f20;
+  }
+
+  .divisor-orn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .divisor-orn .linea {
+    width: 42px;
+    height: 1px;
+    background: #c9c4be;
+  }
+
+  .divisor-orn .rombo {
+    width: 6px;
+    height: 6px;
+    background: #d9584a;
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+</style>

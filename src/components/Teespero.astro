@@ -1,0 +1,135 @@
+---
+// src/components/TeEspero.astro
+interface Props {
+  nombre?: string;
+}
+
+const { nombre = "Suyi" } = Astro.props;
+---
+
+<section class="te-espero">
+  <div class="marco" aria-hidden="true"></div>
+
+  <div class="contenido">
+    <p class="eyebrow">Nos vemos pronto</p>
+
+    <svg class="corazon" viewBox="0 0 24 22" aria-hidden="true">
+      <path
+        d="M12 21 C12 21 1.5 14 1.5 7.2 C1.5 3.5 4.3 1 7.5 1 C9.6 1 11.2 2.1 12 3.7 C12.8 2.1 14.4 1 16.5 1 C19.7 1 22.5 3.5 22.5 7.2 C22.5 14 12 21 12 21 Z"
+        fill="#D9584A"
+      />
+    </svg>
+
+    <p class="mensaje">¡Te espero!</p>
+
+    <div class="divisor-orn" aria-hidden="true">
+      <span class="linea"></span>
+      <span class="rombo"></span>
+      <span class="linea"></span>
+    </div>
+
+    <p class="firma">Con cariño, {nombre}</p>
+  </div>
+</section>
+
+<style>
+  .te-espero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70dvh;
+    padding: 3rem 1.5rem;
+    background: #fffdfb;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .marco {
+    position: absolute;
+    inset: 1.1rem;
+    border: 1px solid #231f20;
+    pointer-events: none;
+  }
+  .marco::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid #d9584a;
+  }
+
+  .contenido {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 1.6rem;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: #8a8681;
+  }
+
+  .corazon {
+    width: 30px;
+    height: auto;
+    margin-bottom: 1.2rem;
+    animation: latir 2s ease-in-out infinite;
+  }
+
+  @keyframes latir {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .mensaje {
+    margin: 0;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    color: #231f20;
+  }
+
+  .divisor-orn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1.8rem 0 1.2rem;
+  }
+
+  .divisor-orn .linea {
+    width: 42px;
+    height: 1px;
+    background: #c9c4be;
+  }
+
+  .divisor-orn .rombo {
+    width: 6px;
+    height: 6px;
+    background: #d9584a;
+    transform: rotate(45deg);
+  }
+
+  .firma {
+    margin: 0;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #8a8681;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .corazon {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,232 @@
+---
+// src/components/QuizCorazon.astro
+---
+
+<section class="quiz-corazon">
+  <svg class="corazon" viewBox="0 0 24 22" aria-hidden="true">
+    <path
+      d="M12 21 C12 21 1.5 14 1.5 7.2 C1.5 3.5 4.3 1 7.5 1 C9.6 1 11.2 2.1 12 3.7 C12.8 2.1 14.4 1 16.5 1 C19.7 1 22.5 3.5 22.5 7.2 C22.5 14 12 21 12 21 Z"
+      fill="#D9584A"
+    />
+  </svg>
+
+  <p class="titulo">¿Qué tanto me conocés?</p>
+
+  <div class="pregunta" data-tipo="opciones" data-correcta="10:15">
+    <p class="enunciado">1. ¿A qué hora nací?</p>
+    <div class="opciones">
+      <button type="button" class="opcion">15:00</button>
+      <button type="button" class="opcion">12:30</button>
+      <button type="button" class="opcion">10:15</button>
+    </div>
+    <p class="feedback" hidden></p>
+  </div>
+
+  <div class="pregunta" data-tipo="opciones" data-correcta="25 de Mayo">
+    <p class="enunciado">2. ¿Dónde nací?</p>
+    <div class="opciones">
+      <button type="button" class="opcion">Catriel</button>
+      <button type="button" class="opcion">25 de Mayo</button>
+      <button type="button" class="opcion">Santa Rosa</button>
+    </div>
+    <p class="feedback" hidden></p>
+  </div>
+
+  <div class="pregunta" data-tipo="texto" data-correcta="alejandra">
+    <p class="enunciado">3. Mi segundo nombre es:</p>
+    <input type="text" class="input-texto" placeholder="Escribí tu respuesta" autocomplete="off" />
+    <p class="feedback" hidden></p>
+  </div>
+
+  <button type="button" class="boton-comprobar" id="boton-comprobar">Comprobar respuestas</button>
+
+  <p class="resultado" id="resultado" hidden></p>
+</section>
+
+<script>
+  function inicializarQuiz(seccion: HTMLElement) {
+    const preguntas = Array.from(seccion.querySelectorAll<HTMLElement>(".pregunta"));
+    const botonComprobar = seccion.querySelector<HTMLButtonElement>("#boton-comprobar")!;
+    const resultado = seccion.querySelector<HTMLElement>("#resultado")!;
+
+    // Selección de opción (preguntas de botones)
+    preguntas.forEach((pregunta) => {
+      const botones = pregunta.querySelectorAll<HTMLButtonElement>(".opcion");
+      botones.forEach((boton) => {
+        boton.addEventListener("click", () => {
+          botones.forEach((b) => b.classList.remove("seleccionada"));
+          boton.classList.add("seleccionada");
+        });
+      });
+    });
+
+    botonComprobar.addEventListener("click", () => {
+      let correctas = 0;
+      const respuestasTexto: string[] = [];
+
+      preguntas.forEach((pregunta) => {
+        const tipo = pregunta.dataset.tipo;
+        const correcta = (pregunta.dataset.correcta ?? "").trim().toLowerCase();
+        const feedback = pregunta.querySelector<HTMLElement>(".feedback")!;
+        let respuestaOk = false;
+        let respuestaDada = "";
+
+        if (tipo === "opciones") {
+          const seleccionada = pregunta.querySelector<HTMLButtonElement>(".opcion.seleccionada");
+          if (!seleccionada) {
+            feedback.hidden = false;
+            feedback.textContent = "Elegí una opción";
+            feedback.className = "feedback aviso";
+            respuestasTexto.push("(sin responder)");
+            return;
+          }
+          respuestaDada = seleccionada.textContent!.trim();
+          respuestaOk = respuestaDada.toLowerCase() === correcta;
+        }
+
+        if (tipo === "texto") {
+          const input = pregunta.querySelector<HTMLInputElement>(".input-texto")!;
+          respuestaDada = input.value.trim();
+          respuestaOk = respuestaDada.toLowerCase() === correcta;
+        }
+
+        respuestasTexto.push(respuestaDada);
+        feedback.hidden = false;
+        feedback.textContent = respuestaOk ? "¡Correcto! 🦋" : "No es esa, ¡pero seguí participando!";
+        feedback.className = respuestaOk ? "feedback correcta" : "feedback incorrecta";
+
+        if (respuestaOk) correctas++;
+      });
+
+      resultado.hidden = false;
+      resultado.textContent =
+        correctas === preguntas.length
+          ? "¡Sos de las que más me conoce! 💕"
+          : `Acertaste ${correctas} de ${preguntas.length}. ¡Gracias por jugar!`;
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>(".quiz-corazon").forEach(inicializarQuiz);
+</script>
+
+<style>
+  .quiz-corazon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3.5rem 1.75rem;
+    background: #fffdfb;
+    text-align: center;
+  }
+
+  .corazon {
+    width: 34px;
+    height: auto;
+    margin-bottom: 0.8rem;
+    animation: latir 1.8s ease-in-out infinite;
+  }
+
+  @keyframes latir {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .titulo {
+    margin: 0 0 2.2rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 5.5vw, 1.5rem);
+    color: #231f20;
+  }
+
+  .pregunta {
+    width: 100%;
+    max-width: 360px;
+    margin-bottom: 2rem;
+  }
+
+  .enunciado {
+    margin: 0 0 0.9rem;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: #231f20;
+  }
+
+  .opciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  .opcion {
+    padding: 0.55rem 1.2rem;
+    border: 1px solid #d9c9c4;
+    border-radius: 999px;
+    background: transparent;
+    font-family: "Cormorant", serif;
+    font-size: 0.9rem;
+    color: #231f20;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .opcion.seleccionada {
+    border-color: #d9584a;
+    background: rgba(217, 88, 74, 0.08);
+    color: #d9584a;
+  }
+
+  .input-texto {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border: 1px solid #d9c9c4;
+    border-radius: 6px;
+    background: #fffdfb;
+    font-family: "Cormorant", serif;
+    font-size: 1rem;
+    color: #231f20;
+    text-align: center;
+  }
+
+  .input-texto:focus {
+    outline: none;
+    border-color: #d9584a;
+  }
+
+  .feedback {
+    margin: 0.6rem 0 0;
+    font-family: "Cormorant", serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+  }
+
+  .feedback.correcta { color: #4a7a5e; }
+  .feedback.incorrecta { color: #a15b4f; }
+  .feedback.aviso { color: #8a8681; }
+
+  .boton-comprobar {
+    margin-top: 0.5rem;
+    padding: 0.85rem 1.9rem;
+    border: 1px solid #231f20;
+    border-radius: 999px;
+    background: #231f20;
+    color: #fffdfb;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .resultado {
+    margin-top: 1.6rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #d9584a;
+  }
+</style>

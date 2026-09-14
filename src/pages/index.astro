@@ -1,17 +1,48 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import Reveal from "../components/Reveal.astro";
+import Portada from "../components/Portada.astro";
+import Timer from "../components/Timer.astro";
+import Frase from "../components/Frase.astro";
+import Ubicacion from "../components/Ubicacion.astro";
+import Galeria from "../components/Galeria.astro";
+import AvisoRSVP from "../components/AvisoRSVP.astro";
+import SobreVirtual from "../components/SobreVirtual.astro";
+import Quizcorazon from "../components/Quizcorazon.astro";
+import BuenDeseo from "../components/BuenDeseo.astro";
+import Teespero from "../components/Teespero.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <Reveal>
+    <Portada />
+  </Reveal>
+  <Reveal>
+    <Timer
+      fechaEvento="2026-10-31T00:00:00"
+      horaEntrada="2026-10-31T21:30:00"
+    />
+  </Reveal>
+  <Reveal>
+    <Frase />
+  </Reveal>
+  <Reveal>
+    <Ubicacion />
+  </Reveal>
+  <Reveal>
+    <Galeria
+      fotos={[
+        { src: "/fotos/foto1.jpg", alt: "Suyi con la pety" },
+        { src: "/fotos/foto2.jpg", alt: "Suyi sentada" },
+        { src: "/fotos/foto3.jpg", alt: "Suyi con un bengala" },
+      ]}
+    />
+  </Reveal>
+  <Reveal>
+    <AvisoRSVP />
+  </Reveal>
+  <SobreVirtual />
+  <Quizcorazon />
+  <BuenDeseo />
+  <Teespero />
+</Layout>

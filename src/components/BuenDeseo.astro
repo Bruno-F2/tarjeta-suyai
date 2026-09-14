@@ -1,0 +1,171 @@
+---
+// src/components/BuenDeseo.astro
+---
+
+<section class="buen-deseo">
+  <p class="titulo">Dejale un buen deseo a Suyi</p>
+
+  <form id="form-deseo" class="form-deseo">
+    <input
+      type="text"
+      id="nombre-deseo"
+      class="input-texto"
+      placeholder="Tu nombre"
+      autocomplete="off"
+      required
+    />
+    <textarea
+      id="mensaje-deseo"
+      class="textarea-deseo"
+      placeholder="Escribí tu buen deseo..."
+      rows="4"
+      required
+    ></textarea>
+    <button type="submit" class="boton-enviar" id="boton-enviar">Enviar deseo</button>
+  </form>
+
+  <p class="feedback" id="feedback-deseo" hidden></p>
+</section>
+
+<script>
+  // Pegá acá el Bin ID y la Access Key que te da JSONBin.io (ver instrucciones)
+  const BIN_ID = "PEGÁ_ACÁ_TU_BIN_ID";
+  const ACCESS_KEY = "PEGÁ_ACÁ_TU_ACCESS_KEY";
+
+  function inicializarDeseo(seccion: HTMLElement) {
+    const form = seccion.querySelector<HTMLFormElement>("#form-deseo")!;
+    const inputNombre = seccion.querySelector<HTMLInputElement>("#nombre-deseo")!;
+    const inputMensaje = seccion.querySelector<HTMLTextAreaElement>("#mensaje-deseo")!;
+    const boton = seccion.querySelector<HTMLButtonElement>("#boton-enviar")!;
+    const feedback = seccion.querySelector<HTMLElement>("#feedback-deseo")!;
+
+    form.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+
+      const nombre = inputNombre.value.trim();
+      const mensaje = inputMensaje.value.trim();
+      if (!nombre || !mensaje) return;
+
+      boton.disabled = true;
+      boton.textContent = "Enviando...";
+
+      try {
+        // 1. Traer los deseos que ya hay guardados
+        const resGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          headers: { "X-Access-Key": ACCESS_KEY },
+        });
+        const datosActuales = await resGet.json();
+        const deseos = Array.isArray(datosActuales.record?.deseos) ? datosActuales.record.deseos : [];
+
+        // 2. Sumar el nuevo deseo
+        deseos.push({
+          nombre,
+          mensaje,
+          fecha: new Date().toISOString(),
+        });
+
+        // 3. Guardar la lista completa de vuelta
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Access-Key": ACCESS_KEY,
+          },
+          body: JSON.stringify({ deseos }),
+        });
+
+        form.hidden = true;
+        feedback.hidden = false;
+        feedback.textContent = "¡Gracias por tu deseo! 💛";
+      } catch {
+        feedback.hidden = false;
+        feedback.textContent = "No se pudo enviar. ¿Podés intentar de nuevo?";
+        feedback.classList.add("error");
+        boton.disabled = false;
+        boton.textContent = "Enviar deseo";
+      }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>(".buen-deseo").forEach(inicializarDeseo);
+</script>
+
+<style>
+  .buen-deseo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3.5rem 1.75rem;
+    background: #fffdfb;
+    text-align: center;
+  }
+
+  .titulo {
+    margin: 0 0 2rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 5.5vw, 1.5rem);
+    color: #231f20;
+  }
+
+  .form-deseo {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .input-texto,
+  .textarea-deseo {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #d9c9c4;
+    border-radius: 6px;
+    background: #fffdfb;
+    font-family: "Cormorant", serif;
+    font-size: 1rem;
+    color: #231f20;
+    resize: vertical;
+  }
+
+  .input-texto:focus,
+  .textarea-deseo:focus {
+    outline: none;
+    border-color: #d9584a;
+  }
+
+  .boton-enviar {
+    align-self: center;
+    margin-top: 0.4rem;
+    padding: 0.85rem 1.9rem;
+    border: 1px solid #231f20;
+    border-radius: 999px;
+    background: #231f20;
+    color: #fffdfb;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .boton-enviar:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .feedback {
+    margin-top: 0.5rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #d9584a;
+  }
+
+  .feedback.error {
+    color: #a15b4f;
+  }
+</style>

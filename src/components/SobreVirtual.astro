@@ -1,0 +1,163 @@
+---
+// src/components/SobreVirtual.astro
+interface Props {
+  frase?: string;
+  alias?: string;
+}
+
+const {
+  frase = "Tu presencia es lo más importante, pero si me querés dar un presente, podés hacerlo el día de mi cumpleaños en una urna o en la siguiente cuenta",
+  alias = "suyaifernandez",
+} = Astro.props;
+---
+
+<section class="sobre-virtual">
+  <p class="frase">{frase}</p>
+
+  <button type="button" class="boton-sobre" id="boton-sobre">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2.5" y="5" width="19" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4" />
+      <path d="M3 6.5 L12 13 L21 6.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none" />
+    </svg>
+    <span id="boton-sobre-texto">Ver Sobre Virtual</span>
+  </button>
+
+  <div class="tarjeta-alias" id="tarjeta-alias" hidden>
+    <p class="alias-texto">
+      Alias: <span id="alias-valor">{alias}</span>
+    </p>
+    <button type="button" class="boton-copiar" id="boton-copiar" data-alias={alias}>
+      Copiar
+    </button>
+  </div>
+</section>
+
+<script>
+  function inicializarSobre(seccion: HTMLElement) {
+    const botonSobre = seccion.querySelector<HTMLButtonElement>("#boton-sobre")!;
+    const textoBoton = seccion.querySelector<HTMLElement>("#boton-sobre-texto")!;
+    const tarjeta = seccion.querySelector<HTMLElement>("#tarjeta-alias")!;
+    const botonCopiar = seccion.querySelector<HTMLButtonElement>("#boton-copiar")!;
+
+    botonSobre.addEventListener("click", () => {
+      const yaVisible = !tarjeta.hidden;
+      tarjeta.hidden = yaVisible;
+      textoBoton.textContent = yaVisible ? "Ver Sobre Virtual" : "Ocultar Sobre Virtual";
+    });
+
+    botonCopiar.addEventListener("click", async () => {
+      const alias = botonCopiar.dataset.alias ?? "";
+      try {
+        await navigator.clipboard.writeText(alias);
+        const textoOriginal = botonCopiar.textContent;
+        botonCopiar.textContent = "¡Copiado!";
+        setTimeout(() => {
+          botonCopiar.textContent = textoOriginal;
+        }, 1800);
+      } catch {
+        // Si el navegador no permite clipboard (poco común), no rompe nada:
+        // el alias ya está visible en pantalla para copiar a mano.
+      }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>(".sobre-virtual").forEach(inicializarSobre);
+</script>
+
+<style>
+  .sobre-virtual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.75rem;
+    background: #fffdfb;
+    text-align: center;
+  }
+
+  .frase {
+    max-width: 34ch;
+    margin: 0 0 1.8rem;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: clamp(1.05rem, 4.6vw, 1.3rem);
+    line-height: 1.55;
+    color: #231f20;
+  }
+
+  .boton-sobre {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.9rem;
+    border: 1px solid #d9584a;
+    border-radius: 999px;
+    background: transparent;
+    font-family: "Cormorant", serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #d9584a;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .boton-sobre:active {
+    background-color: #d9584a;
+    color: #fffdfb;
+  }
+
+  @media (hover: hover) {
+    .boton-sobre:hover {
+      background-color: #d9584a;
+      color: #fffdfb;
+    }
+  }
+
+  .tarjeta-alias {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.6rem;
+    padding: 1.2rem 1.8rem;
+    border: 1px solid #e3dcd8;
+    border-radius: 6px;
+    background: #f9f5f3;
+    animation: aparecer 0.35s ease-out;
+  }
+
+  .tarjeta-alias[hidden] {
+    display: none;
+  }
+
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .alias-texto {
+    margin: 0;
+    font-family: "Cormorant", serif;
+    font-size: clamp(1.05rem, 4.4vw, 1.25rem);
+    color: #231f20;
+  }
+
+  .alias-texto span {
+    font-weight: 600;
+    color: #d9584a;
+  }
+
+  .boton-copiar {
+    padding: 0.45rem 1.2rem;
+    border: none;
+    border-radius: 999px;
+    background: #231f20;
+    color: #fffdfb;
+    font-family: "Cormorant", serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+</style>
