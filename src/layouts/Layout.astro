@@ -1,11 +1,55 @@
 ---
-import MusicaFondo from '../components/MusicaFondo.astro';
+import MusicaFondo from "../components/MusicaFondo.astro";
 ---
+
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Evita que el modo oscuro del celular invierta los colores del sitio -->
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#FFFDFB" />
+
     <title>Mis XV Suyi</title>
+    <meta
+      name="description"
+      content="Te invito a celebrar mis 15 años. Sábado 31 de octubre, Club Villa Mengelle."
+    />
+
+    <!-- Vista Previa -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mis XV Suyi 🦋" />
+    <meta
+      property="og:description"
+      content="Te invito a celebrar mis 15 años. Sábado 31 de octubre, Club Villa Mengelle."
+    />
+    <meta
+      property="og:image"
+      content="https://mis15suyi.netlify.app/og-image.jpg"
+    />
+    <meta property="og:url" content="https://mis15suyi.netlify.app/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mis XV Suyi 🦋" />
+    <meta
+      name="twitter:description"
+      content="Te invito a celebrar mis 15 años. Sábado 31 de octubre, Club Villa Mengelle."
+    />
+    <meta
+      name="twitter:image"
+      content="https://mis15suyi.netlify.app/og-image.jpg"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      html,
+      body {
+        background: #fffdfb;
+      }
+    </style>
   </head>
   <body>
     <MusicaFondo />
